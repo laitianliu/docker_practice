@@ -4,14 +4,14 @@
 
 [Node.js](https://en.wikipedia.org/wiki/Node.js) 是基于 JavaScript 的可扩展服务端和网络软件开发平台。
 
-该仓库位于 `https://hub.docker.com/_/node/` ，提供了 Node.js 0.10 ~ 11.x 各个版本的镜像。
+该仓库位于 `https://hub.docker.com/_/node/` ，提供了 Node.js 0.10 ~ 12.x 各个版本的镜像。
 
 ### 使用方法
 
 在项目中创建一个 Dockerfile。
 
 ```bash
-FROM node:9
+FROM node:12
 # replace this with your application's default port
 EXPOSE 8888
 ```
@@ -31,7 +31,7 @@ $ docker run -it --rm \
     # -v "$(pwd)":/usr/src/myapp \
     --mount type=bind,src=`$(pwd)`,target=/usr/src/myapp \
     -w /usr/src/myapp \
-    node:9-alpine \
+    node:12-alpine \
     node your-daemon-or-script.js
 ```
 

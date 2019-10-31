@@ -10,7 +10,7 @@
 
 > 国内各大云服务商均提供了 Docker 镜像加速服务，建议根据运行 Docker 的云平台选择对应的镜像加速服务，具体请参考官方文档。
 
-我们以 Azure 中国镜像 `https://dockerhub.azk8s.cn` 为例进行介绍。
+本节我们以 Azure 中国镜像 `https://dockerhub.azk8s.cn` 为例进行介绍。
 
 ### Ubuntu 16.04+、Debian 8+、CentOS 7
 
@@ -38,11 +38,29 @@ $ sudo systemctl restart docker
 
 ### Windows 10
 
-对于使用 Windows 10 的系统，在系统右下角托盘 Docker 图标内右键菜单选择 `Settings`，打开配置窗口后左侧导航菜单选择 `Daemon`。在 `Registry mirrors` 一栏中填写加速器地址 `https://dockerhub.azk8s.cn`，之后点击 `Apply` 保存后 Docker 就会重启并应用配置的镜像地址了。
+对于使用 `Windows 10` 的用户，在任务栏托盘 Docker 图标内右键菜单选择 `Settings`，打开配置窗口后在左侧导航菜单选择 `Docker Engine`，在右侧像下边一样编辑 json 文件，之后点击 `Apply & Restart` 保存后 Docker 就会重启并应用配置的镜像地址了。
+
+```json
+{
+  "registry-mirrors": [
+    "https://dockerhub.azk8s.cn",
+    "https://reg-mirror.qiniu.com"
+  ]
+}
+```
 
 ### macOS
 
-对于使用 macOS 的用户，在任务栏点击 Docker Desktop 应用图标 -> Perferences... -> Daemon -> Registry mirrors。在列表中填写加速器地址 `https://dockerhub.azk8s.cn`。修改完成之后，点击 `Apply & Restart` 按钮，Docker 就会重启并应用配置的镜像地址了。
+对于使用 macOS 的用户，在任务栏点击 Docker Desktop 应用图标 -> `Perferences`，在左侧导航菜单选择 `Docker Engine`，在右侧像下边一样编辑 json 文件。修改完成之后，点击 `Apply & Restart` 按钮，Docker 就会重启并应用配置的镜像地址了。
+
+```json
+{
+  "registry-mirrors": [
+    "https://dockerhub.azk8s.cn",
+    "https://reg-mirror.qiniu.com"
+  ]
+}
+```
 
 ### 检查加速器是否生效
 
@@ -58,7 +76,7 @@ Registry Mirrors:
 国内无法直接获取 `gcr.io/*` 镜像，我们可以将 `gcr.io/<repo-name>/<image-name>:<version>` 替换为 `gcr.azk8s.cn/<repo-name>/<image-name>:<version>` ,例如
 
 ```bash
-# docker pull gcr.io/google_containers/hyperkube-amd64:v1.9.2
+# $ docker pull gcr.io/google_containers/hyperkube-amd64:v1.9.2
 
-docker pull gcr.azk8s.cn/google_containers/hyperkube-amd64:v1.9.2
+$ docker pull gcr.azk8s.cn/google_containers/hyperkube-amd64:v1.9.2
 ```

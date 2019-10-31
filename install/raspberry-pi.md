@@ -10,8 +10,6 @@ Docker CE 支持以下版本的 [Raspbian](https://www.raspberrypi.org/downloads
 
 * Raspbian Stretch
 
-* Raspbian Jessie (Docker CE v18.06 及以下版本)
-
 *注：* `Raspbian` 是树莓派的开发与维护机构 [树莓派基金会](http://www.raspberrypi.org/) 推荐用于树莓派的首选系统，其基于 `Debian`。
 
 ### 使用 APT 安装
@@ -72,14 +70,15 @@ $ sudo apt-get install docker-ce
 
 ### 使用脚本自动安装
 
-在测试或开发环境中 Docker 官方为了简化安装流程，提供了一套便捷的安装脚本，Raspbian 系统上可以使用这套脚本安装：
+在测试或开发环境中 Docker 官方为了简化安装流程，提供了一套便捷的安装脚本，Raspbian 系统上可以使用这套脚本安装，另外可以通过 `--mirror` 选项使用国内源进行安装：
 
 ```bash
 $ curl -fsSL get.docker.com -o get-docker.sh
 $ sudo sh get-docker.sh --mirror Aliyun
+# $ sudo sh get-docker.sh --mirror AzureChinaCloud
 ```
 
-执行这个命令后，脚本就会自动的将一切准备工作做好，并且把 Docker CE 的 Edge 版本安装在系统中。
+执行这个命令后，脚本就会自动的将一切准备工作做好，并且把 Docker CE 的稳定(stable)版本安装在系统中。
 
 ### 启动 Docker CE
 
