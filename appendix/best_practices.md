@@ -36,7 +36,7 @@
 
 下面是来自 `buildpack-deps` 镜像的例子：
 
-```dockerfile
+```docker
 RUN apt-get update && apt-get install -y \
   bzr \
   cvs \
@@ -72,7 +72,7 @@ RUN apt-get update && apt-get install -y \
 
 >注意：如果你的字符串中包含空格，必须将字符串放入引号中或者对空格使用转义。如果字符串内容本身就包含引号，必须对引号使用转义。
 
-```dockerfile
+```docker
 # Set one or more individual labels
 LABEL com.example.version="0.0.1-beta"
 
@@ -85,7 +85,7 @@ LABEL com.example.version.is-production=""
 
 一个镜像可以包含多个标签，但建议将多个标签放入到一个 `LABEL` 指令中。
 
-```dockerfile
+```docker
 # Set multiple labels at once, using line-continuation characters to break long lines
 LABEL vendor=ACME\ Incorporated \
       com.example.is-beta= \
@@ -108,7 +108,7 @@ LABEL vendor=ACME\ Incorporated \
 
 永远将 `RUN apt-get update` 和 `apt-get install` 组合成一条 `RUN` 声明，例如：
 
-```dockerfile
+```docker
 RUN apt-get update && apt-get install -y \
         package-bar \
         package-baz \
@@ -117,7 +117,7 @@ RUN apt-get update && apt-get install -y \
 
 将 `apt-get update` 放在一条单独的 `RUN` 声明中会导致缓存问题以及后续的 `apt-get install` 失败。比如，假设你有一个 `Dockerfile` 文件：
 
-```dockerfile
+```docker
 FROM ubuntu:18.04
 
 RUN apt-get update
@@ -127,7 +127,7 @@ RUN apt-get install -y curl
 
 构建镜像后，所有的层都在 Docker 的缓存中。假设你后来又修改了其中的 `apt-get install` 添加了一个包：
 
-```dockerfile
+```docker
 FROM ubuntu:18.04
 
 RUN apt-get update
@@ -139,7 +139,7 @@ Docker 发现修改后的 `RUN apt-get update` 指令和之前的完全一样。
 
 使用 `RUN apt-get update && apt-get install -y` 可以确保你的 Dockerfiles 每次安装的都是包的最新的版本，而且这个过程不需要进一步的编码或额外干预。这项技术叫作 `cache busting`。你也可以显示指定一个包的版本号来达到 `cache-busting`，这就是所谓的固定版本，例如：
 
-```dockerfile
+```docker
 RUN apt-get update && apt-get install -y \
     package-bar \
     package-baz \
@@ -150,7 +150,7 @@ RUN apt-get update && apt-get install -y \
 
 下面是一个 `RUN` 指令的示例模板，展示了所有关于 `apt-get` 的建议。
 
-```dockerfile
+```docker
 RUN apt-get update && apt-get install -y \
     aufs-tools \
     automake \
@@ -167,9 +167,9 @@ RUN apt-get update && apt-get install -y \
  && rm -rf /var/lib/apt/lists/*
 ```
 
-其中 `s3cmd` 指令指定了一个版本号 `1.1.*`。如果之前的镜像使用的是更旧的版本，指定新的版本会导致 `apt-get udpate` 缓存失效并确保安装的是新版本。
+其中 `s3cmd` 指令指定了一个版本号 `1.1.*`。如果之前的镜像使用的是更旧的版本，指定新的版本会导致 `apt-get update` 缓存失效并确保安装的是新版本。
 
-另外，清理掉 apt 缓存 `var/lib/apt/lists` 可以减小镜像大小。因为 `RUN` 指令的开头为 `apt-get udpate`，包缓存总是会在 `apt-get install` 之前刷新。
+另外，清理掉 apt 缓存 `var/lib/apt/lists` 可以减小镜像大小。因为 `RUN` 指令的开头为 `apt-get update`，包缓存总是会在 `apt-get install` 之前刷新。
 
 > 注意：官方的 Debian 和 Ubuntu 镜像会自动运行 apt-get clean，所以不需要显式的调用 apt-get clean。
 
@@ -193,7 +193,7 @@ RUN apt-get update && apt-get install -y \
 
 最后，`ENV` 也能用于设置常见的版本号，比如下面的示例：
 
-```dockerfile
+```docker
 ENV PG_MAJOR 9.3
 
 ENV PG_VERSION 9.3.4
@@ -211,7 +211,7 @@ ENV PATH /usr/local/postgres-$PG_MAJOR/bin:$PATH
 
 如果你的 `Dockerfile` 有多个步骤需要使用上下文中不同的文件。单独 `COPY` 每个文件，而不是一次性的 `COPY` 所有文件，这将保证每个步骤的构建缓存只在特定的文件变化时失效。例如：
 
-```dockerfile
+```docker
 COPY requirements.txt /tmp/
 
 RUN pip install --requirement /tmp/requirements.txt
@@ -223,7 +223,7 @@ COPY . /tmp/
 
 为了让镜像尽量小，最好不要使用 `ADD` 指令从远程 URL 获取包，而是使用 `curl` 和 `wget`。这样你可以在文件提取完之后删掉不再需要的文件来避免在镜像中额外添加一层。比如尽量避免下面的用法：
 
-```dockerfile
+```docker
 ADD http://example.com/big.tar.xz /usr/src/things/
 
 RUN tar -xJf /usr/src/things/big.tar.xz -C /usr/src/things
@@ -233,7 +233,7 @@ RUN make -C /usr/src/things all
 
 而是应该使用下面这种方法：
 
-```dockerfile
+```docker
 RUN mkdir -p /usr/src/things \
     && curl -SL http://example.com/big.tar.xz \
     | tar -xJC /usr/src/things \
@@ -250,7 +250,7 @@ RUN mkdir -p /usr/src/things \
 
 例如，下面的示例镜像提供了命令行工具 `s3cmd`:
 
-```dockerfile
+```docker
 ENTRYPOINT ["s3cmd"]
 
 CMD ["--help"]
@@ -295,7 +295,7 @@ exec "$@"
 
 该辅助脚本被拷贝到容器，并在容器启动时通过 `ENTRYPOINT` 执行：
 
-```dockerfile
+```docker
 COPY ./docker-entrypoint.sh /
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
@@ -329,7 +329,7 @@ $ docker run --rm -it postgres bash
 
 如果某个服务不需要特权执行，建议使用 `USER` 指令切换到非 root 用户。先在 `Dockerfile` 中使用类似 `RUN groupadd -r postgres && useradd -r -g postgres postgres` 的指令创建用户和用户组。
 
->注意：在镜像中，用户和用户组每次被分配的 UID/GID 都是不确定的，下次重新构建镜像时被分配到的 UID/GID 可能会不一样。如果要依赖确定的 UID/GID，你应该显示的指定一个 UID/GID。
+>注意：在镜像中，用户和用户组每次被分配的 UID/GID 都是不确定的，下次重新构建镜像时被分配到的 UID/GID 可能会不一样。如果要依赖确定的 UID/GID，你应该显式的指定一个 UID/GID。
 
 你应该避免使用 `sudo`，因为它不可预期的 TTY 和信号转发行为可能造成的问题比它能解决的问题还多。如果你真的需要和 `sudo` 类似的功能（例如，以 root 权限初始化某个守护进程，以非 root 权限执行它），你可以使用 [gosu](https://github.com/tianon/gosu)。
 
